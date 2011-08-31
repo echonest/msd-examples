@@ -29,13 +29,13 @@ MSD Data on S3
 These examples use MSD data that has been loaded on to S3 at s3://tbmmsd.  There are around 330 files each with about 3000
 sets track data each (one set per line) where each line is represented by 54 fields as described here:  
     
-    http://labrosa.ee.columbia.edu/millionsong/pages/field-list
+ http://labrosa.ee.columbia.edu/millionsong/pages/field-list
 
 except that in the flat file format, the 'track id' field has been moved from field 52 to the first field.
 
 
 Map-reduce jobs
-=============-=
+===============
 
 Density
 ------
