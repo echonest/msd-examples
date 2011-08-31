@@ -33,6 +33,10 @@ sets track data each (one set per line) where each line is represented by 54 fie
 
 except that in the flat file format, the 'track id' field has been moved from field 52 to the first field.
 
+In the repository you will find tiny.dat which contains data for 20 tracks.
+
+
+
 
 Map-reduce jobs
 ===============
