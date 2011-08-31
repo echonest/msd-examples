@@ -1,8 +1,31 @@
-# msd-examples
+msd-examples
+===========
 
-Examples of processing the Million Song Database
+Example code for processing the Million Song Database. This repostory contains
+code that can be used to process the million song dataset.
+
+ < http://labrosa.ee.columbia.edu/millionsong/pages/getting-dataset >
+
+Density
+------
+Finds the most dense and the least dense songs
+
+density.py
 
 
-## Complexity
+### Local Usage:
 
-Finds the most complex and the least complex songs
+    python density.py tiny.dat
+
+
+### EC2 Usage
+This will run the job on EC2 Map reduce on 100 small instances. Note that you have to 
+add the track.py code to t.tar.gz with:
+
+    % tar cvfz t.tar.gz track.py
+
+      
+  python density.py --num-ec2-instances 100 --python-archive t.tar.gz -r emr 's3://tbmmsd/*.tsv.*' > output.dat
+
+
+

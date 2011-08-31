@@ -1,9 +1,22 @@
+
+""" Processes track data from the Million Song Database.  Specifically, this
+    file contains functions that load the flat-file format of tracks for the
+    MSD. The format is one track per line, where each line is represented by 54
+    fields as described here:  
+    
+    http://labrosa.ee.columbia.edu/millionsong/pages/field-list
+
+    except that in the flat file format, the 'track id' field has been moved
+    from field 52 to the first field.
+
+    A track is represented as a dictionary.
+"""
+
 import sys
 import pprint
 
-# based on http://labrosa.ee.columbia.edu/millionsong/pages/field-list
-
 def load_track(line):
+    """ Loads a track from a single line """
     t = {}
 
     f = line.split('\t')
@@ -101,8 +114,6 @@ def load_track(line):
         t['track_7digitalid'] = int(f[52])
         t['preview'] = 'http://previews.7digital.com/clips/34/%d.clip.mp3' % (int(f[52]), )
         t['year'] = int(f[53])
-
-
         return t
     else:
         print 'mismatched fields, found', len(f), 'should have 54'
@@ -112,6 +123,7 @@ def load_track(line):
 
 
 def load_tracks(path):
+    """ Loads a list of track from a file """
 
     tracks = []
     file = open(path)
@@ -125,6 +137,7 @@ def load_tracks(path):
     return tracks
 
 def process_tracks(path, func):
+    """ applies func(track) to each track found in path  """
     file = open(path)
     for which, line in enumerate(file):
         track = load_track(line)
@@ -136,6 +149,7 @@ def process_tracks(path, func):
 
 
 def dump(track):
+    """ Dumps some data from a track for debugging """
     print track['line'], track['track_id'], track['artist_id'],  len(track['artist_mbtags']), \
         len(track['artist_terms'] ), len(track['bars']), len(track['beats']), track['title'], \
         track['key'], track['mode'], len(track['segments'])
