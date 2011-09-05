@@ -81,7 +81,7 @@ def load_track(line):
         seg_loudness_max_time = f[37].split(',')
         seg_loudness_max_start = f[38].split(',')
         seg_pitches = f[39].split(',')
-        seg_start = f[40].split(',')
+        seg_start = f[40].split(',')[:-1]
         seg_timbre = f[41].split(',')
 
         PITCH_COUNT = 12
@@ -94,10 +94,14 @@ def load_track(line):
                 seg['confidence'] = float(seg_confidence[i])
                 seg['loudness_max'] = float(seg_loudness_max[i])
                 seg['loudness_max_time'] = float(seg_loudness_max_time[i])
-                seg['loudness_max_start'] = float(seg_loudness_max_start[i])
+                seg['loudness_start'] = float(seg_loudness_max_start[i])
                 seg['pitch'] =[ float(p) for p in seg_pitches[i * PITCH_COUNT: i * PITCH_COUNT + PITCH_COUNT]]
                 seg['timbre'] =[ float(p) for p in seg_timbre[i * TIMBRE_COUNT: i * TIMBRE_COUNT + TIMBRE_COUNT]]
                 t['segments'].append(seg)
+                if i < len(seg_start) - 1:
+                    seg['duration'] = float(seg_start[i + 1]) - seg['start']
+                else:
+                    seg['duration'] = t['duration']  - seg['start']
 
         t['similar_artists'] = [s for s in f[42].split(',') if len(s) > 0]
         t['song_hotttnesss'] = float(f[43])
@@ -153,6 +157,9 @@ def dump(track):
     print track['line'], track['track_id'], track['artist_id'],  len(track['artist_mbtags']), \
         len(track['artist_terms'] ), len(track['bars']), len(track['beats']), track['title'], \
         track['key'], track['mode'], len(track['segments'])
+    for seg in track['segments']:
+        print '   ', seg['start'], seg['duration'], track['duration']
+    print
 
 
 if __name__ == '__main__':
