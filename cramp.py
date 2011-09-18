@@ -7,6 +7,8 @@
 
 from mrjob.job import MRJob
 import track
+from itertools import imap
+import unicodedata
 
 # if YIELD_ALL is true, we yield all densities, otherwise,
 # we yield just the extremes
@@ -27,6 +29,8 @@ class MRRamp(MRJob):
             first_count = 0
             second_count = 0
 
+            xdata = []
+            ydata = []
             for i in xrange(len(segments)):
                 seg = segments[i]
 
@@ -57,19 +61,46 @@ class MRRamp(MRJob):
                     second_half += seg_loudness
                     second_count += 1
 
+                xdata.append( seg['start'] )
+                ydata.append( seg['loudness_max'] )
+
             # only yield data if we've had sufficient segments in the first
             # and second half of the track. (This is to avoid the proverbial
             # hidden tracks that have extreme amounts of leading or tailing
             # silene
 
+            correlation = pearsonr(xdata, ydata)
             if first_count > 10 and second_count > 10:
                 ramp_factor = second_half / half_track - first_half / half_track
-                if YIELD_ALL or ramp_factor > 10 or ramp_factor < -10:
-                    yield (t['artist_name'], t['title'], t['track_id']), ramp_factor
+                #if YIELD_ALL or ramp_factor > 10 or ramp_factor < -10:
+                if YIELD_ALL or ramp_factor > 10 and correlation > .5:
+                    yield (t['artist_name'], t['title'], t['track_id'], correlation), ramp_factor
 
     # no need for a reducer
     #def reducer(self, key, val):
         #yield (key, sum(val))
+
+
+def pearsonr(x, y):
+  # Assume len(x) == len(y)
+    n = len(x)
+    sum_x = sum(x)
+    sum_y = sum(y)
+    sum_x_sq = sum(map(lambda x: pow(x, 2), x))
+    sum_y_sq = sum(map(lambda x: pow(x, 2), y))
+    psum = sum(imap(lambda x, y: x * y, x, y))
+    num = psum - (sum_x * sum_y/n)
+    den = pow((sum_x_sq - pow(sum_x, 2) / n) * (sum_y_sq - pow(sum_y, 2) / n), 0.5)
+    if den == 0: 
+        return 0
+    return num / den
+
+
+def test():
+    x = [1,2,3,4,5,6,7,8,9,10]
+    y = [10, 20, 35, 45, 47, 60, 70, 87, 91, 100]
+    print pearsonr(x,y)
+
 
 if __name__ == '__main__':
     MRRamp.run()

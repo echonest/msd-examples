@@ -1,0 +1,15 @@
+#!/bin/bash
+# ID  TRANELS128F425B25C
+# I'll Kill You by Konami Kukeiha Club
+
+ID=`awk ' $2 == "ID"  { $1= ""; $2 = ""; print }' data/$1.out`
+title=`awk ' NR==2 { $1 = ""; print }' data/$1.out`
+
+rm plot
+echo plot \"$1.out\" using 1:2 with line linecolor rgb \"#eeeeee\" title \"\" >> plot
+echo replot "$1.out" using 1:3 with line linecolor rgb \"blue\" title \"loudness\" >> plot
+echo set xlabel \"Time seconds\" >> plot
+echo set ylabel \"decibels\" >> plot
+echo set title \"$title\" >> plot
+echo set terminal ps >> plot
+echo set output \"$ID.ps\" >> plot
